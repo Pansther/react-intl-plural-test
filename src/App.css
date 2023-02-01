@@ -12,6 +12,11 @@
   flex-direction: column;
 }
 
+.form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;

@@ -1,23 +1,52 @@
-import React, { useRef, useState } from "react";
-import reactLogo from "./assets/react.svg";
-import "./App.css";
-import { FormattedMessage, IntlProvider, useIntl } from "react-intl";
+import { useState } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
+import { FormattedMessage, IntlProvider } from "react-intl";
+
 import { localeStore } from "./store/localeStore";
+
+import "./App.css";
 
 const App = () => {
   const [state, setState] = useRecoilState(localeStore);
 
   const [inputState, setInputState] = useState([
     {
+      id: "1",
       value: 0,
       name: "benefits_character_typed",
     },
     {
+      id: "2",
       value: 100,
       name: "benefits_character_limit",
     },
+    {
+      id: "3",
+      value: 0,
+      name: "",
+    },
+    {
+      id: "4",
+      value: 0,
+      name: "",
+    },
   ]);
+
+  const onNameChange = (changedIndex: number, name: string) => {
+    const newInputState = [...inputState];
+
+    newInputState[changedIndex].name = name;
+
+    setInputState(newInputState);
+  };
+
+  const onValueChange = (changedIndex: number, value: number) => {
+    const newInputState = [...inputState];
+
+    newInputState[changedIndex].value = value;
+
+    setInputState(newInputState);
+  };
 
   return (
     <div className="App">
@@ -55,57 +84,27 @@ const App = () => {
           }
         />
       </div>
-      <div>
-        <div>
-          <input
-            style={{ width: 200 }}
-            id="first-variable-name"
-            defaultValue={inputState[0].name}
-            onChange={({ currentTarget }) =>
-              setInputState((prev) => [
-                { ...prev[0], name: currentTarget?.value ?? "" },
-                prev[1],
-              ])
-            }
-          />
-          <input
-            type="number"
-            defaultValue="0"
-            id="first-variable-value"
-            style={{ width: 200 }}
-            onChange={({ currentTarget }) =>
-              setInputState((prev) => [
-                { ...prev[0], value: parseInt(currentTarget?.value ?? "0") },
-                prev[1],
-              ])
-            }
-          />
-        </div>
-        <div>
-          <input
-            style={{ width: 200 }}
-            id="second-variable-name"
-            defaultValue={inputState[1].name}
-            onChange={({ currentTarget }) =>
-              setInputState((prev) => [
-                prev[0],
-                { ...prev[1], name: currentTarget?.value ?? "" },
-              ])
-            }
-          />
-          <input
-            type="number"
-            defaultValue="100"
-            id="second-variable-value"
-            style={{ width: 200 }}
-            onChange={({ currentTarget }) =>
-              setInputState((prev) => [
-                prev[0],
-                { ...prev[1], value: parseInt(currentTarget?.value ?? "0") },
-              ])
-            }
-          />
-        </div>
+      <div className="form">
+        {inputState?.map(({ id, name, value }, index) => (
+          <>
+            <input
+              key={id}
+              style={{ width: 200 }}
+              defaultValue={name}
+              onChange={({ currentTarget }) =>
+                onNameChange(index, currentTarget?.value ?? "")
+              }
+            />
+            <input
+              type="number"
+              style={{ width: 200 }}
+              defaultValue={value}
+              onChange={({ currentTarget }) =>
+                onValueChange(index, parseInt(currentTarget?.value ?? "0"))
+              }
+            />
+          </>
+        ))}
       </div>
       <div style={{ gap: 20, display: "flex", alignItems: "center" }}>
         {state.locale}
@@ -122,16 +121,16 @@ const App = () => {
           Thai
         </button>
       </div>
-      <div>
+      <h3>
         <FormattedMessage
           id="main"
           defaultMessage={"error"}
-          values={{
-            [inputState[0].name]: [inputState[0].value],
-            [inputState[1].name]: [inputState[1].value],
-          }}
+          values={inputState?.reduce(
+            (prev, { name, value }) => ({ ...prev, [name]: value }),
+            {}
+          )}
         />
-      </div>
+      </h3>
     </div>
   );
 };
